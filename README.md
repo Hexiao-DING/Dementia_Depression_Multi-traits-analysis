@@ -24,8 +24,14 @@ This is a comperhensive R code for MTAG analysis in Dementia_Depression comorbid
 - Many workflows write intermediate and final outputs under `Files/` (for example, `FUMA_results`, `Coloc_results`, or `MTAG_results`). Ensure these directories exist or create them before running the scripts.
 - When sharing the repository, avoid committing large intermediate datasets; focus on scripts and lightweight configuration files.
 
-## Contributor
-The code is written by Na Li (SCU) and Hexiao Ding (PolyU).
+## Acknowledgements
+
+- **Version**: 2.5 FINAL  
+- **Last Updated**: 2025-10-29
+- **Contributor**: Hexiao Ding (PolyU); Jing Lan (PolyU); Na Li (SCU)
+- **Superviosr**: Dr. Jung Sun Yoo (PolyU)
+- **Institute**: The Hong Kong Polytechnic University, Sichuan University
+
 
 
 
