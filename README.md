@@ -26,9 +26,9 @@ This is a comperhensive R code for MTAG analysis in Dementia_Depression comorbid
 
 ## Acknowledgements
 
-- **Version**: 2.5 FINAL  
-- **Last Updated**: 2025-10-29
-- **Contributor**: Hexiao Ding (PolyU); Jing Lan (PolyU); Na Li (SCU)
+- **Version**: 1.0 
+- **Last Updated**: 2025-11-10
+- **Contributor**: Hexiao Ding (PolyU); Na Li (SCU)
 - **Superviosr**: Dr. Jung Sun Yoo (PolyU)
 - **Institute**: The Hong Kong Polytechnic University, Sichuan University
 
