@@ -16,7 +16,7 @@ This repository contains a comprehensive, production-ready workflow for investig
 
 ## Background
 
-We integrate multiple GWAS cohorts spanning dementias (Alzheimer's disease, vascular dementia, Lewy body dementia, frontotemporal dementia, undefined dementia, and composite FinnGen endpoints) and depression-related traits (depressive disorders, major depressive disorder, mixed anxiety and depression). The primary goal is to characterise pleiotropic loci and regulatory mechanisms that underpin the comorbidity between neurodegeneration and psychiatric phenotypes. MTAG is used to boost discovery power across correlated traits, FUMA supplies locus-level annotation and gene prioritisation, and HyPrColoc quantifies the evidence for shared causal variants between MTAG signals and tissue-specific eQTL panels.
+We integrate multiple GWAS cohorts spanning dementias (Alzheimer's disease, vascular dementia, Lewy body dementia, frontotemporal dementia, undefined dementia, dementia, cognitive performance) and depression-related traits (depressive disorders, major depressive disorder, mixed anxiety and depression). The primary goal is to characterise pleiotropic loci and regulatory mechanisms that underpin the comorbidity between neurodegeneration and psychiatric phenotypes. MTAG is used to boost discovery power across correlated traits, FUMA supplies locus-level annotation and gene prioritisation, and HyPrColoc quantifies the evidence for shared causal variants between MTAG signals and tissue-specific eQTL panels.
 
 ## Trait Catalogue and GWAS Sources
 
