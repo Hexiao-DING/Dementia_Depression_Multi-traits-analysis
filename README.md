@@ -157,13 +157,6 @@ Each script contains detailed parameter annotations; please consult the header c
 - Trait-trait and GWAS-eQTL colocalisation summaries in `Files/Coloc_results/`.
 - Optional SMR replication outputs under the SMR working directory described in the documentation.
 
-## Reproducibility Guidelines
-
-- **Version control**: commit only scripts and configuration files. Large matrix or summary data sets should be excluded (consider `.gitignore` rules).
-- **Metadata tracking**: capture software versions, LD reference panels, and eQTL releases used in each run within a lab notebook or an additional markdown log.
-- **Random seeds**: set deterministic seeds where scripts perform random sampling or bootstrapping.
-- **Documentation**: update the `docs/` folder with any deviations from the default pipeline to keep collaborators aligned.
-
 ## Acknowledgements
 
 - **Version**: 1.0 
