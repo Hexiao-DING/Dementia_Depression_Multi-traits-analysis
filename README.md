@@ -12,7 +12,6 @@ This repository contains a comprehensive, production-ready workflow for investig
 - [Data Preparation](#data-preparation)
 - [Analytical Modules](#analytical-modules)
 - [Key Outputs](#key-outputs)
-- [Reproducibility Guidelines](#reproducibility-guidelines)
 - [Acknowledgements](#acknowledgements)
 
 ## Background
