@@ -66,7 +66,7 @@ All analyses rely on publicly available or FinnGen-released GWAS summary statist
 
 ### External Tools
 
-- MTAG (Jon Jala et al.) for multi-trait GWAS meta-analysis.
+- MTAG for multi-trait GWAS meta-analysis. 'Turley, P. et al. Multi-trait analysis of genome-wide association summary statistics using MTAG. Nat. Genet 50, 229–237 (2018).'
 - FUMA (Functional Mapping and Annotation) web outputs (scripts assume results downloaded locally).
 - SMR (Summary-data-based Mendelian Randomization) for replication analyses (steps detailed in `docs/Step4-NovelLoci_2_replication_SMR.txt`).
 - PLINK reference data (1KG EUR) and brain eQTL summary statistics (for example MetaBrain or GTEx) as specified by the scripts.
