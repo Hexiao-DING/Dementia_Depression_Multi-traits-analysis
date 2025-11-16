@@ -45,59 +45,25 @@ This pipeline harmonises publicly available GWAS summary statistics stored under
 
 Note: If your file names differ, update them consistently across steps (QC → MTAG → FUMA → colocalisation).
 
-### Dementia-related traits (7 outcomes)
+### Dementia Traits (7 outcomes)
 
-- **Dementia (FinnGen endpoint F5_DEMENTIA)**
-  - File: `Finn-b-F5_DEMENTIA.tsv.gz`
-  - Source: FinnGen Risteys endpoint F5_DEMENTIA (`https://r10.risteys.finngen.fi/endpoints/F5_DEMENTIA`)
-  - Reference: Kurki MI, et al. Nature. 2023;613:508–518.
+| Trait | Summary Statistics | Source | Primary Citation |
+| ----- | ------------------ | ------ | ---------------- |
+| Dementia (FinnGen endpoint F5_DEMENTIA) | `Finn-b-F5_DEMENTIA.tsv.gz` | [FinnGen](https://r10.risteys.finngen.fi/endpoints/F5_DEMENTIA) | Kurki, M. I. *et al.* (2023) *Nature* 613, 508-518. |
+| Alzheimer's disease | `GCST90012877.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/33589840) | Schwartzentruber, J. *et al.* (2021) *Nat. Genet.* 53, 392-402. |
+| Cognitive performance | `GCST006572.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/30038396) | Lee, J. J. *et al.* (2018) *Nat. Genet.* 50, 1112-1121. |
+| Vascular dementia (FinnGen endpoint F5_VASCDEM) | `Finn-b-F5_VASCDEM.tsv.gz` | [FinnGen](https://r9.risteys.finngen.fi/endpoints/F5_VASCDEM) | Kurki, M. I. *et al.* (2023) *Nature* 613, 508-518. |
+| Lewy body dementia | `GCST90001390.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/33589841) | Chia, R. *et al.* (2021) *Nat. Genet.* 53, 294-303. |
+| Frontotemporal dementia | `GCST90558311.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/40280976) | Pottier, C. *et al.* (2025) *Nat. Commun.* 16, 3914. |
+| Undefined dementia (FinnGen endpoint F5_DEMNAS) | `Finn_b_F5_DEMNAS.tsv.gz` | [FinnGen](https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS) | Kurki, M. I. *et al.* (2023) *Nature* 613, 508-518. |
 
-- **Alzheimer’s disease**
-  - File: `GCST90012877.tsv.gz`
-  - Source: GWAS Catalog (`https://www.ebi.ac.uk/gwas/`), publication ID 33589840
-  - Reference: Schwartzentruber J, et al. Nat Genet. 2021;53:392–402.
+### Depression Traits (3 outcomes)
 
-- **Cognitive performance**
-  - File: `GCST006572.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Lee JJ, et al. Nat Genet. 2018;50:1112–1121.
-
-- **Vascular dementia (FinnGen endpoint F5_VASCDEM)**
-  - File: `Finn-b-F5_VASCDEM.tsv.gz`
-  - Source: FinnGen Risteys endpoint F5_VASCDEM (`https://r9.risteys.finngen.fi/endpoints/F5_VASCDEM`)
-  - Reference: Kurki MI, et al. Nature. 2023;613:508–518.
-
-- **Lewy body dementia**
-  - File: `GCST90001390.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Chia R, et al. Nat Genet. 2021;53:294–303.
-
-- **Frontotemporal dementia**
-  - File: `GCST90558311.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Pottier C, et al. Nat Commun. 2025;16:3914.
-
-- **Undefined dementia (FinnGen endpoint F5_DEMNAS)**
-  - File: `Finn_b_F5_DEMNAS.tsv.gz`
-  - Source: FinnGen Risteys endpoint F5_DEMNAS (`https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS`)
-  - Reference: Kurki MI, et al. Nature. 2023;613:508–518.
-
-### Depression-spectrum traits (3 outcomes)
-
-- **Depressive disorders**
-  - File: `GCST90476922.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Verma A, et al. Science. 2024;385:eadj1182.
-
-- **Major depressive disorder**
-  - File: `GCST90468123.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Loya H, et al. Nat Genet. 2025;57:461–468.
-
-- **Mixed anxiety and depressive disorder**
-  - File: `GCST90225526.tsv.gz`
-  - Source: GWAS Catalog
-  - Reference: Brasher MS, et al. Genes Brain Behav. 2023;22:e12851.
+| Trait | Summary Statistics | Source | Primary Citation |
+| ----- | ------------------ | ------ | ---------------- |
+| Depressive disorders | `GCST90476922.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/39024449) | Verma, A. *et al.* (2024) *Science* 385, eadj1182. |
+| Major depressive disorder | `GCST90468123.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/39789286) | Loya, H. *et al.* (2025) *Nat. Genet.* 57, 461-468. |
+| Mixed anxiety and depressive disorder | `GCST90225526.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/37259642) | Brasher, M. S. *et al.* (2023) *Genes Brain Behav.* 22, e12851. |
 
 Where available, prefer the latest builds (GRCh37/GRCh38 as required by downstream tools) and harmonise alleles to a consistent reference. See the QC step for build liftover and allele orientation handling.
 
