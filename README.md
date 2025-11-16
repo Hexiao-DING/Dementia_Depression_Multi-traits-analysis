@@ -41,9 +41,7 @@ GWAS sumstats  ──▶  QC + Harmonise (R)  ──▶  MTAG (Linux)  ──▶
 
 ## Trait Catalogue and GWAS Sources
 
-This pipeline harmonises publicly available GWAS summary statistics stored under `Data/GWAS/Downloaded_original_data/`. Below are the core traits used in the dementia–depression analyses, with expected filenames, primary sources, and key references. Please respect data usage licenses for each provider.
-
-Note: If your file names differ, update them consistently across steps (QC → MTAG → FUMA → colocalisation).
+This pipeline harmonises publicly available GWAS summary statistics stored under `Data/GWAS/Downloaded_original_data/`. Below are the core traits used in the dementia–depression analyses, with expected filenames, primary sources, and key references. Please respect data usage licenses for each provider. Note: If your file names differ, update them consistently across steps (QC → MTAG → FUMA → colocalisation).
 
 ### Dementia Traits (7 outcomes)
 
