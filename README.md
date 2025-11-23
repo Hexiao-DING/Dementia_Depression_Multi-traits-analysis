@@ -51,9 +51,10 @@ This pipeline provides a **robust, modular workflow** to study pleiotropy betwee
 │                         Pipeline Workflow                                   │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-  Raw GWAS Data
-       │
-       ▼
+
+                Raw GWAS Data
+                       │
+                       ▼
   ┌────────────────────────────────────────────────────────────┐
   │  Step 1: Quality Control & Harmonisation (R)               │
   │  • Allele checks & orientation                             │
