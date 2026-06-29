@@ -85,31 +85,11 @@ This pipeline addresses three questions in sequence.
 
 ## 🗺 Pipeline at a glance
 
-Two data streams enter the workflow. The GWAS stream runs the full association-to-colocalisation arc. The single-cell stream provides orthogonal validation, and the two converge on shared, mechanistically supported genes.
+The workflow runs as a single linear pipeline. GWAS summary statistics for ten traits pass through quality control, joint multi-trait association, functional annotation, novel-locus definition, and two colocalisation stages. Genes prioritised by these stages are then examined in single-nucleus brain transcriptomes, and the pipeline converges on shared, mechanistically supported genes including NEGR1.
 
-```mermaid
-flowchart TB
-    G(["GWAS summary statistics<br/>7 dementia + 3 depression traits"]):::inp
-    S1["Step 1 · QC and harmonisation"]:::g
-    S2["Step 2 · MTAG"]:::g
-    S3["Step 3 · FUMA annotation"]:::g
-    S4["Step 4 · Novel-locus definition"]:::g
-    S5["Step 5 · Trait–trait colocalisation"]:::g
-    S6["Step 6 · GWAS–eQTL colocalisation"]:::g
-
-    SN(["Single-nucleus RNA-seq<br/>GSE303823 · GSE213982 · GSE144136"]):::inp
-    S7["Step 7 · Single-cell validation"]:::sc
-
-    OUT(["Shared, mechanistically supported<br/>genes, including NEGR1"]):::out
-
-    G --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> OUT
-    SN --> S7 --> OUT
-
-    classDef inp fill:#eceff4,stroke:#8a94a6,color:#1f2933;
-    classDef g fill:#e7f0fd,stroke:#3b82f6,color:#1f2933;
-    classDef sc fill:#e7f6ec,stroke:#22a06b,color:#1f2933;
-    classDef out fill:#fff4e0,stroke:#f59e0b,stroke-width:2px,color:#1f2933;
-```
+<div align="center">
+  <img src="pipeline.svg" alt="Pipeline overview. GWAS summary statistics for 7 dementia and 3 depression traits pass through Step 1 quality control and harmonisation, Step 2 MTAG, Step 3 FUMA annotation, Step 4 novel-locus definition, Step 5 trait-trait colocalisation, and Step 6 GWAS-eQTL colocalisation, followed by Step 7 single-cell validation on snRNA-seq data (GSE303823, GSE213982, GSE144136), converging on shared genes including NEGR1." width="430">
+</div>
 
 | Stage | Folder | Language | Core tools |
 | ----- | ------ | -------- | ---------- |
