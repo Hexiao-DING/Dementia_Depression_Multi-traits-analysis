@@ -49,7 +49,7 @@
 
 ## 🎯 Overview
 
-This repository contains the full computational pipeline behind a multi-trait genetic study of dementia and depression comorbidity. It moves from raw public GWAS summary statistics to harmonised inputs, joint multi-trait association (MTAG), functional annotation (FUMA), novel-locus definition, statistical colocalisation (HyPrColoc) against brain expression panels, and single-nucleus transcriptomic validation centred on the candidate gene **NEGR1**.
+This repository contains the full computational pipeline behind a multi-trait genetic study of dementia and depression comorbidity. It moves from raw public European-ancestry GWAS summary statistics to harmonised inputs, joint multi-trait association (MTAG), functional annotation (FUMA), novel-locus definition, statistical colocalisation (HyPrColoc) against brain expression panels, and single-nucleus transcriptomic validation centred on the candidate gene **NEGR1**.
 
 The code is organised as **seven sequential stages**, each in its own numbered folder. Stages are modular, so a stage can be run on its own provided its inputs are present. R drives quality control, colocalisation, and single-cell work; Python drives FUMA post-processing and novel-locus definition; MTAG runs from the command line under a Python 2.7 environment on Linux.
 
@@ -64,7 +64,7 @@ The code is organised as **seven sequential stages**, each in its own numbered f
 All data and code needed to reproduce the analyses are openly available. No controlled-access application is required to obtain the summary statistics or single-cell data used here.
 
 - **Code.** Every analysis script is in this repository, organised into the seven pipeline stages described below. The public tools required are listed under [Installation](#-installation).
-- **GWAS summary statistics.** All ten input GWAS are public. Dementia and depression statistics come from the GWAS Catalog and from FinnGen release R12. Accessions, genome builds, and source studies with DOIs are listed under [GWAS data sources](#-gwas-data-sources).
+- **GWAS summary statistics.** All ten input GWAS are public and European-ancestry. Dementia and depression statistics come from the GWAS Catalog and from FinnGen release R12. Accessions, genome builds, ancestry, and source studies with DOIs are listed under [GWAS data sources](#-gwas-data-sources).
 - **Single-nucleus RNA-seq.** The three single-cell datasets are public in the Gene Expression Omnibus under accessions GSE303823, GSE213982, and GSE144136, detailed under [Single-cell data sources](#-single-cell-data-sources).
 - **Brain eQTL panels.** Colocalisation uses the public GTEx v7 and MetaBrain cortex eQTL panels.
 - **Reference resources.** dbSNP 144, the 1000 Genomes reference, and UCSC liftover chains are listed under [Reference resources](#reference-resources).
@@ -85,10 +85,10 @@ This pipeline addresses three questions in sequence.
 
 ## 🗺 Pipeline at a glance
 
-The workflow runs as a single linear pipeline. GWAS summary statistics for ten traits pass through quality control, joint multi-trait association, functional annotation, novel-locus definition, and two colocalisation stages. Genes prioritised by these stages are then examined in single-nucleus brain transcriptomes, and the pipeline converges on shared, mechanistically supported genes including NEGR1.
+The workflow runs as a single linear pipeline. European-ancestry GWAS summary statistics for ten traits pass through quality control, joint multi-trait association, functional annotation, novel-locus definition, and two colocalisation stages. Genes prioritised by these stages are then examined in single-nucleus brain transcriptomes, and the pipeline converges on shared, mechanistically supported genes including NEGR1.
 
 <div align="center">
-  <img src="pipeline.svg" alt="Pipeline overview. GWAS summary statistics for 7 dementia and 3 depression traits pass through Step 1 quality control and harmonisation, Step 2 MTAG, Step 3 FUMA annotation, Step 4 novel-locus definition, Step 5 trait-trait colocalisation, and Step 6 GWAS-eQTL colocalisation, followed by Step 7 single-cell validation on snRNA-seq data (GSE303823, GSE213982, GSE144136), converging on shared genes including NEGR1." width="430">
+  <img src="pipeline.svg" alt="Pipeline overview. European-ancestry GWAS summary statistics for 7 dementia and 3 depression traits pass through Step 1 quality control and harmonisation, Step 2 MTAG, Step 3 FUMA annotation, Step 4 novel-locus definition, Step 5 trait-trait colocalisation, and Step 6 GWAS-eQTL colocalisation, followed by Step 7 single-cell validation on snRNA-seq data (GSE303823, GSE213982, GSE144136), converging on shared genes including NEGR1." width="430">
 </div>
 
 | Stage | Folder | Language | Core tools |
@@ -161,23 +161,25 @@ All summary statistics are publicly available. Download each file and place it u
 
 ### Dementia-related traits (7)
 
-| Trait | Accession | Build | Study |
-| ----- | --------- | ----- | ----- |
-| Alzheimer's disease | [`GCST90012877`](https://www.ebi.ac.uk/gwas/studies/GCST90012877) | GRCh37 | Schwartzentruber et al. (2021) *Nat. Genet.* 53, 392–402. [doi:10.1038/s41588-020-00776-w](https://doi.org/10.1038/s41588-020-00776-w) |
-| Cognitive performance | [`GCST006572`](https://www.ebi.ac.uk/gwas/studies/GCST006572) | GRCh37 | Lee et al. (2018) *Nat. Genet.* 50, 1112–1121. [doi:10.1038/s41588-018-0147-3](https://doi.org/10.1038/s41588-018-0147-3) |
-| Frontotemporal dementia | [`GCST90558311`](https://www.ebi.ac.uk/gwas/studies/GCST90558311) | GRCh37 | Pottier et al. (2025) *Nat. Commun.* 16, 3914. [doi:10.1038/s41467-025-59216-0](https://doi.org/10.1038/s41467-025-59216-0) |
-| Lewy body dementia | [`GCST90001390`](https://www.ebi.ac.uk/gwas/studies/GCST90001390) | GRCh38 | Chia et al. (2021) *Nat. Genet.* 53, 294–303. [doi:10.1038/s41588-021-00785-3](https://doi.org/10.1038/s41588-021-00785-3) |
-| Overall dementia | [`F5_DEMENTIA`](https://r12.risteys.finngen.fi/endpoints/F5_DEMENTIA) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
-| Vascular dementia | [`F5_VASCDEM`](https://r12.risteys.finngen.fi/endpoints/F5_VASCDEM) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
-| Undefined dementia | [`F5_DEMNAS`](https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+| Trait | Accession | Build | Ancestry | Study |
+| ----- | --------- | ----- | -------- | ----- |
+| Alzheimer's disease | [`GCST90012877`](https://www.ebi.ac.uk/gwas/studies/GCST90012877) | GRCh37 | European | Schwartzentruber et al. (2021) *Nat. Genet.* 53, 392–402. [doi:10.1038/s41588-020-00776-w](https://doi.org/10.1038/s41588-020-00776-w) |
+| Cognitive performance | [`GCST006572`](https://www.ebi.ac.uk/gwas/studies/GCST006572) | GRCh37 | European | Lee et al. (2018) *Nat. Genet.* 50, 1112–1121. [doi:10.1038/s41588-018-0147-3](https://doi.org/10.1038/s41588-018-0147-3) |
+| Frontotemporal dementia | [`GCST90558311`](https://www.ebi.ac.uk/gwas/studies/GCST90558311) | GRCh37 | European | Pottier et al. (2025) *Nat. Commun.* 16, 3914. [doi:10.1038/s41467-025-59216-0](https://doi.org/10.1038/s41467-025-59216-0) |
+| Lewy body dementia | [`GCST90001390`](https://www.ebi.ac.uk/gwas/studies/GCST90001390) | GRCh38 | European | Chia et al. (2021) *Nat. Genet.* 53, 294–303. [doi:10.1038/s41588-021-00785-3](https://doi.org/10.1038/s41588-021-00785-3) |
+| Overall dementia | [`F5_DEMENTIA`](https://r12.risteys.finngen.fi/endpoints/F5_DEMENTIA) (FinnGen R12) | GRCh38 | European (Finnish) | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+| Vascular dementia | [`F5_VASCDEM`](https://r12.risteys.finngen.fi/endpoints/F5_VASCDEM) (FinnGen R12) | GRCh38 | European (Finnish) | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+| Undefined dementia | [`F5_DEMNAS`](https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS) (FinnGen R12) | GRCh38 | European (Finnish) | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
 
 ### Depression-spectrum traits (3)
 
-| Trait | Accession | Build | Study |
-| ----- | --------- | ----- | ----- |
-| Depressive disorders | [`GCST90476922`](https://www.ebi.ac.uk/gwas/studies/GCST90476922) | GRCh38 | Verma et al. (2024) *Science* 385, eadj1182. [doi:10.1126/science.adj1182](https://doi.org/10.1126/science.adj1182) |
-| Major depressive disorder | [`GCST90468123`](https://www.ebi.ac.uk/gwas/studies/GCST90468123) | GRCh37 | Loya et al. (2025) *Nat. Genet.* 57, 461–468. [doi:10.1038/s41588-024-02044-7](https://doi.org/10.1038/s41588-024-02044-7) |
-| Mixed anxiety and depressive disorder | [`GCST90225526`](https://www.ebi.ac.uk/gwas/studies/GCST90225526) | GRCh37 | Brasher et al. (2023) *Genes Brain Behav.* 22, e12851. [doi:10.1111/gbb.12851](https://doi.org/10.1111/gbb.12851) |
+| Trait | Accession | Build | Ancestry | Study |
+| ----- | --------- | ----- | -------- | ----- |
+| Depressive disorders | [`GCST90476922`](https://www.ebi.ac.uk/gwas/studies/GCST90476922) | GRCh38 | European | Verma et al. (2024) *Science* 385, eadj1182. [doi:10.1126/science.adj1182](https://doi.org/10.1126/science.adj1182) |
+| Major depressive disorder | [`GCST90468123`](https://www.ebi.ac.uk/gwas/studies/GCST90468123) | GRCh37 | European | Loya et al. (2025) *Nat. Genet.* 57, 461–468. [doi:10.1038/s41588-024-02044-7](https://doi.org/10.1038/s41588-024-02044-7) |
+| Mixed anxiety and depressive disorder | [`GCST90225526`](https://www.ebi.ac.uk/gwas/studies/GCST90225526) | GRCh37 | European | Brasher et al. (2023) *Genes Brain Behav.* 22, e12851. [doi:10.1111/gbb.12851](https://doi.org/10.1111/gbb.12851) |
+
+> **Ancestry and reference-panel coherence.** All ten input GWAS are European-ancestry. FinnGen contributes the Finnish founder population, a European genetic isolate whose population bottleneck gives it a linkage-disequilibrium profile that differs from outbred European samples. Holding ancestry constant matches both the downstream references and the assumptions of the methods used here. MTAG and HyPrColoc assume ancestry-comparable linkage disequilibrium across inputs, the linkage-disequilibrium reference for FUMA and SMR is 1000 Genomes EUR, and the brain expression panels are predominantly European (GTEx v7) and European by construction (MetaBrain Cortex-EUR). Harmonising every study to GRCh37 (hg19) also aligns coordinates with GTEx v7 and the 1000 Genomes hs37d5 reference, both on hg19.
 
 ### Reference resources
 
@@ -436,6 +438,7 @@ source("Step 7. Single-cell RNA analysis/Step7-05scRNA_analysis_scTenifoldKnk.R"
 
 - **Paths.** Every script encodes absolute Windows-style paths from the original analysis. Edit these before running, or mirror the directory layout locally.
 - **Builds.** Inputs arrive in a mix of GRCh37 and GRCh38. Confirm the build of each source, keep liftover chain files available, and verify a consistent build before MTAG and colocalisation.
+- **Ancestry.** All input GWAS are European-ancestry, matching the 1000 Genomes EUR linkage-disequilibrium reference and the European brain expression panels used downstream. MTAG corrects for cross-trait sample overlap through the LDSC intercept. Keeping inputs within one ancestry avoids linkage-disequilibrium mismatch in MTAG and in the colocalisation steps.
 - **Allele orientation.** Effect-allele orientation must be consistent across traits before MTAG and across trait and eQTL before HyPrColoc. Misaligned alleles are a common cause of spurious or absent signal.
 - **MTAG environment.** MTAG depends on Python 2.7 and an older Fortran runtime. Keep it isolated from the Python 3 and R environments used elsewhere.
 - **Disk.** Intermediate GWAS and eQTL files are large. Allow ample free space before starting.
