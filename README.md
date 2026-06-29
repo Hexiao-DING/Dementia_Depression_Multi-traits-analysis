@@ -1,138 +1,226 @@
 <div align="center">
 
-# 🧬 Dementia–Depression Multi‑Trait Analysis Pipeline
+# 🧬 Dementia–Depression Multi-Trait Analysis Pipeline
 
-**A comprehensive, end-to-end workflow for pleiotropy analysis across dementia and depression traits**
+**An end-to-end genomic workflow for dissecting the shared genetic architecture of dementia and depression**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![R](https://img.shields.io/badge/R-%3E%3D%204.2-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
-[![Python](https://img.shields.io/badge/Python-%3E%3D%203.8-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey)]()
+<p>
+  <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+  <a href="https://www.r-project.org/"><img alt="R" src="https://img.shields.io/badge/R-%E2%89%A5%204.2-276DC3?logo=r&logoColor=white"></a>
+  <a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/Python-%E2%89%A5%203.8-3776AB?logo=python&logoColor=white"></a>
+  <img alt="Platform" src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey">
+  <img alt="Pipeline" src="https://img.shields.io/badge/Pipeline-7%20stages-success">
+</p>
 
-[Documentation](#-overview) • [Quick Start](#-quick-start) • [Workflow](#-workflow-steps) • [Citation](#-citation-and-references)
+<p>
+  <b>MTAG</b> · <b>FUMA</b> · <b>HyPrColoc</b> · <b>SMR</b> · <b>single-nucleus RNA-seq</b>
+</p>
+
+[Overview](#-overview) ·
+[Pipeline](#-pipeline-at-a-glance) ·
+[Data](#-gwas-data-sources) ·
+[Install](#-installation) ·
+[Run](#-running-the-pipeline) ·
+[Cite](#-citation)
 
 </div>
-
-
-
 
 ---
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Features](#-features)
-- [Trait Catalogue](#-trait-catalogue-and-gwas-sources)
+- [Data and code availability](#-data-and-code-availability)
+- [Scientific rationale](#-scientific-rationale)
+- [Pipeline at a glance](#-pipeline-at-a-glance)
+- [Repository structure](#-repository-structure)
+- [GWAS data sources](#-gwas-data-sources)
+- [Single-cell data sources](#-single-cell-data-sources)
 - [Installation](#-installation)
-- [Quick Start](#-quick-start)
-- [Data Preparation](#-data-preparation)
-- [Workflow Steps](#-workflow-steps)
+- [Running the pipeline](#-running-the-pipeline)
 - [Outputs](#-outputs)
+- [Reproducibility notes](#-reproducibility-notes)
 - [Troubleshooting](#-troubleshooting)
-- [FAQ](#-faq)
-- [Citation and References](#-citation-and-references)
-- [Acknowledgements](#-acknowledgements)
+- [Citation](#-citation)
+- [License](#-license)
+- [Authors and acknowledgements](#-authors-and-acknowledgements)
 
 ---
 
 ## 🎯 Overview
 
-This pipeline provides a **robust, modular workflow** to study pleiotropy between dementia phenotypes and depression-spectrum traits. It integrates harmonised GWAS summary statistics with multi-trait meta-analysis (MTAG), functional annotation (FUMA), and colocalisation analysis (HyPrColoc) against brain eQTL resources.
+This repository contains the full computational pipeline behind a multi-trait genetic study of dementia and depression comorbidity. It moves from raw public GWAS summary statistics to harmonised inputs, joint multi-trait association (MTAG), functional annotation (FUMA), novel-locus definition, statistical colocalisation (HyPrColoc) against brain expression panels, and single-nucleus transcriptomic validation centred on the candidate gene **NEGR1**.
 
-### Key Objectives
+The code is organised as **seven sequential stages**, each in its own numbered folder. Stages are modular, so a stage can be run on its own provided its inputs are present. R drives quality control, colocalisation, and single-cell work; Python drives FUMA post-processing and novel-locus definition; MTAG runs from the command line under a Python 2.7 environment on Linux.
 
-- 🔍 **Identify** shared genetic architecture between dementia and depression
-- 📊 **Harmonise** public GWAS summary statistics to a uniform schema
-- 🔬 **Annotate** loci with functional mapping and gene context
-- 🎯 **Evaluate** shared genetic signals using colocalisation methods
-- ✅ **Ensure** reproducibility through clear environment specifications and deterministic processing
-
-### Pipeline Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         Pipeline Workflow                                   │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-
-                Raw GWAS Data
-                       │
-                       ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Step 1: Quality Control & Harmonisation (R)               │
-  │  • Allele checks & orientation                             │
-  │  • β/SE computation from OR                                │
-  │  • MAF imputation                                          │
-  │  • Build liftover (GRCh37 ↔ GRCh38)                        │
-  └────────────────────┬───────────────────────────────────────┘
-                       │
-                       ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Step 2: Multi-Trait Meta-Analysis (MTAG, Linux)           │
-  │  • Trait alignment                                         │
-  │  • Joint effect estimation                                 │
-  └────────────────────┬───────────────────────────────────────┘
-                       │
-                       ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Step 3: Functional Annotation (FUMA, Web + Python)        │
-  │  • Locus identification                                    │
-  │  • Gene mapping & annotation                               │
-  │  • Robustness filtering                                    │
-  └────────────────────┬───────────────────────────────────────┘
-                       │
-                       ▼
-  ┌────────────────────────────────────────────────────────────┐
-  │  Steps 4-7: Colocalisation Analysis (R)                    │
-  │  • Trait-trait colocalisation (HyPrColoc)                  │
-  │  • GWAS-eQTL colocalisation (MetaBrain, GTEx)              │
-  │  • Result integration & visualization                      │
-  └────────────────────────────────────────────────────────────┘
+```text
+56.8% R   ·   43.2% Python   ·   ~4,000 lines across 23 scripts (13 R, 10 Python)
 ```
 
 ---
 
-## ✨ Features
+## 📦 Data and code availability
 
-- 🔄 **Modular Design**: Execute individual steps or run the complete pipeline
-- 🛡️ **Robust QC**: Comprehensive quality control and harmonisation procedures
-- 📈 **Multi-Trait Analysis**: Leverage MTAG for improved power and precision
-- 🧬 **Functional Annotation**: Integrate FUMA for gene mapping and context
-- 🎯 **Colocalisation**: Identify shared causal variants across traits and eQTLs
-- 🔬 **Reproducible**: Version-controlled environments and deterministic processing
-- 📚 **Well-Documented**: Comprehensive documentation and examples
+All data and code needed to reproduce the analyses are openly available. No controlled-access application is required to obtain the summary statistics or single-cell data used here.
+
+- **Code.** Every analysis script is in this repository, organised into the seven pipeline stages described below. The public tools required are listed under [Installation](#-installation).
+- **GWAS summary statistics.** All ten input GWAS are public. Dementia and depression statistics come from the GWAS Catalog and from FinnGen release R12. Accessions, genome builds, and source studies with DOIs are listed under [GWAS data sources](#-gwas-data-sources).
+- **Single-nucleus RNA-seq.** The three single-cell datasets are public in the Gene Expression Omnibus under accessions GSE303823, GSE213982, and GSE144136, detailed under [Single-cell data sources](#-single-cell-data-sources).
+- **Brain eQTL panels.** Colocalisation uses the public GTEx v7 and MetaBrain cortex eQTL panels.
+- **Reference resources.** dbSNP 144, the 1000 Genomes reference, and UCSC liftover chains are listed under [Reference resources](#reference-resources).
 
 ---
 
-## 📊 Trait Catalogue and GWAS Sources
+## 🔬 Scientific rationale
 
-This pipeline harmonises publicly available GWAS summary statistics. All data should be placed under `Data/GWAS/Downloaded_original_data/`. Please **respect data usage licenses** for each provider.
+Dementia and depression co-occur far more often than chance, and the direction of that relationship is hard to separate from confounding and reverse causation in observational data. Genetic data offer a complementary angle. If the two phenotypes share causal variants, that shared signal points toward common biological mechanisms rather than purely epidemiological association.
 
-> **⚠️ Important**: If your file names differ, update them consistently across all steps (QC → MTAG → FUMA → colocalisation).
+This pipeline addresses three questions in sequence.
 
-### Dementia-Related Traits (7 outcomes)
+1. **Where do dementia and depression share association signal?** MTAG borrows power across genetically correlated traits to sharpen joint effect estimates and surface loci that single-trait GWAS underpowers.
+2. **Which of those loci are shared rather than merely neighbouring?** HyPrColoc tests whether two traits, or a trait and a brain eQTL, are driven by the same causal variant within a region, distinguishing true colocalisation from linkage-driven coincidence.
+3. **Is the candidate mechanism visible at single-cell resolution?** Single-nucleus RNA-seq of human brain tissue tests whether prioritised genes, in particular NEGR1, show cell-type-specific differential expression, co-expression structure, altered cell communication, and sensitivity to in-silico knockout.
 
-| Trait | Summary Statistics | Source | Primary Citation |
-|:------|:-------------------|:-------|:-----------------|
-| **Dementia**<br>(FinnGen F5_DEMENTIA) | `Finn-b-F5_DEMENTIA.tsv.gz` | [FinnGen Risteys](https://r10.risteys.finngen.fi/endpoints/F5_DEMENTIA) | Kurki *et al.* (2023) *Nature* **613**, 508-518 |
-| **Alzheimer's disease** | `GCST90012877.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/33589840) | Schwartzentruber *et al.* (2021) *Nat. Genet.* **53**, 392-402 |
-| **Cognitive performance** | `GCST006572.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/30038396) | Lee *et al.* (2018) *Nat. Genet.* **50**, 1112-1121 |
-| **Vascular dementia**<br>(FinnGen F5_VASCDEM) | `Finn-b-F5_VASCDEM.tsv.gz` | [FinnGen Risteys](https://r9.risteys.finngen.fi/endpoints/F5_VASCDEM) | Kurki *et al.* (2023) *Nature* **613**, 508-518 |
-| **Lewy body dementia** | `GCST90001390.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/33589841) | Chia *et al.* (2021) *Nat. Genet.* **53**, 294-303 |
-| **Frontotemporal dementia** | `GCST90558311.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/40280976) | Pottier *et al.* (2025) *Nat. Commun.* **16**, 3914 |
-| **Undefined dementia**<br>(FinnGen F5_DEMNAS) | `Finn_b_F5_DEMNAS.tsv.gz` | [FinnGen Risteys](https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS) | Kurki *et al.* (2023) *Nature* **613**, 508-518 |
+---
 
-### Depression-Spectrum Traits (3 outcomes)
+## 🗺 Pipeline at a glance
 
-| Trait | Summary Statistics | Source | Primary Citation |
-|:------|:-------------------|:-------|:-----------------|
-| **Depressive disorders** | `GCST90476922.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/39024449) | Verma *et al.* (2024) *Science* **385**, eadj1182 |
-| **Major depressive disorder** | `GCST90468123.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/39789286) | Loya *et al.* (2025) *Nat. Genet.* **57**, 461-468 |
-| **Mixed anxiety and depressive disorder** | `GCST90225526.tsv.gz` | [GWAS Catalog](https://www.ebi.ac.uk/gwas/publications/37259642) | Brasher *et al.* (2023) *Genes Brain Behav.* **22**, e12851 |
+Two data streams enter the workflow. The GWAS stream runs the full association-to-colocalisation arc. The single-cell stream provides orthogonal validation, and the two converge on shared, mechanistically supported genes.
 
-### Genome Build Notes
+```mermaid
+flowchart TB
+    G(["GWAS summary statistics<br/>7 dementia + 3 depression traits"]):::inp
+    S1["Step 1 · QC and harmonisation"]:::g
+    S2["Step 2 · MTAG"]:::g
+    S3["Step 3 · FUMA annotation"]:::g
+    S4["Step 4 · Novel-locus definition"]:::g
+    S5["Step 5 · Trait–trait colocalisation"]:::g
+    S6["Step 6 · GWAS–eQTL colocalisation"]:::g
 
-The pipeline supports both **GRCh37** and **GRCh38** with automatic liftover capabilities. Prefer the latest builds as required by downstream tools and harmonise alleles to a consistent reference. See the QC step for detailed build liftover and allele orientation handling.
+    SN(["Single-nucleus RNA-seq<br/>GSE303823 · GSE213982 · GSE144136"]):::inp
+    S7["Step 7 · Single-cell validation"]:::sc
+
+    OUT(["Shared, mechanistically supported<br/>genes, including NEGR1"]):::out
+
+    G --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> OUT
+    SN --> S7 --> OUT
+
+    classDef inp fill:#eceff4,stroke:#8a94a6,color:#1f2933;
+    classDef g fill:#e7f0fd,stroke:#3b82f6,color:#1f2933;
+    classDef sc fill:#e7f6ec,stroke:#22a06b,color:#1f2933;
+    classDef out fill:#fff4e0,stroke:#f59e0b,stroke-width:2px,color:#1f2933;
+```
+
+| Stage | Folder | Language | Core tools |
+| ----- | ------ | -------- | ---------- |
+| 1 | `Step 1. Quality control_GWAS` | R | MungeSumstats, rtracklayer, data.table |
+| 2 | `Step 2. MTAG_Linux command` | Shell / Python 2.7 | MTAG |
+| 3 | `Step 3. Functional mapping and annotation (FUMA)` | Python | pandas, FUMA outputs |
+| 4 | `Step 4. Novel loci definition and replication` | Python / Shell | pandas, SMR |
+| 5 | `Step 5. Trait-trait colocalisation analysis` | R / Python | hyprcoloc |
+| 6 | `Step 6. trait-eQTL colocalisation analysis` | R / Python | hyprcoloc, GTEx v7, MetaBrain |
+| 7 | `Step 7. Single-cell RNA analysis` | R | Seurat, MAST, hdWGCNA, muscat, CellChat, scTenifoldKnk |
+
+---
+
+## 📁 Repository structure
+
+```text
+Dementia_Depression_Multi-traits-analysis/
+│
+├── Step 1. Quality control_GWAS/
+│   ├── Step1-QC_GWAS_DEMtraits.R          # Alzheimer's, cognition, FTD, Lewy body dementia
+│   ├── Step1-QC_GWAS_DDtraits.R           # depressive disorders, MADD, MDD
+│   └── Step1-QC_GWAS_Finngen.R            # FinnGen R12 dementia endpoints
+│
+├── Step 2. MTAG_Linux command/
+│   └── Step2-MTAG_linux.txt               # py2.7 environment setup and MTAG invocation
+│
+├── Step 3. Functional mapping and annotation (FUMA)/
+│   ├── Step3-FUMA_1_Table_creating.py     # parse raw FUMA outputs into per-locus tables
+│   ├── Step3-FUMA_2_Merging_by_trait.py   # merge annotations across trait pairs
+│   ├── Step3-FUMA_3_Robust_filter.py      # concordance and robustness checks
+│   ├── Step3-FUMA_4_Delete_failed.py      # drop non-robust entries
+│   ├── Step3-FUMA_5_Unique_IndSNPs.py     # deduplicate independent lead SNPs
+│   ├── Step3-FUMA_6.1_ExamSNPs_dementia.py
+│   └── Step3-FUMA_6.2_ExamSNPs_depression.py
+│
+├── Step 4. Novel loci definition and replication/
+│   ├── Step4-NovelLoci_1_definition.py    # flag loci absent from known catalogues
+│   └── Step4-NovelLoci_2_replication_SMR.txt
+│
+├── Step 5. Trait-trait colocalisation analysis/
+│   ├── Step5-Hyprcoloc_Trait-Trait.R      # HyPrColoc across trait pairs at sentinels
+│   └── Step5_Merging_Trait-Trait_coloc.py # consolidate per-pair results
+│
+├── Step 6. trait-eQTL colocalisation analysis/
+│   ├── Step6-Hyprcoloc_GWAS-eQTL.R        # HyPrColoc versus GTEx v7 brain eQTL
+│   ├── Step6-Hyprcoloc_3_GWAS-eQTLBrain.R # HyPrColoc versus MetaBrain eQTL
+│   ├── Step6_Merging_1_gene_symbol.R      # map probes to gene symbols
+│   └── Step6_Merging_2_GWAS-eQTL_coloc.py # consolidate eQTL colocalisation results
+│
+├── Step 7. Single-cell RNA analysis/
+│   ├── Step7-scRNA_analysis_Rset.R        # environment and library setup
+│   ├── Step7-01scRNA_analysis_QC.R        # Seurat ingestion, QC, diagnosis labelling
+│   ├── Step7-02scRNA_analysis_MAST&hdWGCNA.R  # cell-type DE and co-expression networks
+│   ├── Step7-03scRNA_analysis_muscat.R    # pseudobulk differential state analysis
+│   ├── Step7-04scRNA_analysis_CellChat.R  # cell–cell communication, NEGR signalling
+│   └── Step7-05scRNA_analysis_scTenifoldKnk.R  # in-silico NEGR1 knockout
+│
+├── LICENSE                                 # MIT
+└── README.md
+```
+
+---
+
+## 🧾 GWAS data sources
+
+All summary statistics are publicly available. Download each file and place it under a local `Downloaded_original_data/` directory before running Step 1. Respect the data-use terms of each provider. If your file names differ from those below, update them consistently across every stage that reads them.
+
+> **Note.** Builds are mixed across sources. Step 1 harmonises every study to GRCh37 (hg19), lifting GRCh38 coordinates down with `rtracklayer` where required.
+
+### Dementia-related traits (7)
+
+| Trait | Accession | Build | Study |
+| ----- | --------- | ----- | ----- |
+| Alzheimer's disease | [`GCST90012877`](https://www.ebi.ac.uk/gwas/studies/GCST90012877) | GRCh37 | Schwartzentruber et al. (2021) *Nat. Genet.* 53, 392–402. [doi:10.1038/s41588-020-00776-w](https://doi.org/10.1038/s41588-020-00776-w) |
+| Cognitive performance | [`GCST006572`](https://www.ebi.ac.uk/gwas/studies/GCST006572) | GRCh37 | Lee et al. (2018) *Nat. Genet.* 50, 1112–1121. [doi:10.1038/s41588-018-0147-3](https://doi.org/10.1038/s41588-018-0147-3) |
+| Frontotemporal dementia | [`GCST90558311`](https://www.ebi.ac.uk/gwas/studies/GCST90558311) | GRCh37 | Pottier et al. (2025) *Nat. Commun.* 16, 3914. [doi:10.1038/s41467-025-59216-0](https://doi.org/10.1038/s41467-025-59216-0) |
+| Lewy body dementia | [`GCST90001390`](https://www.ebi.ac.uk/gwas/studies/GCST90001390) | GRCh38 | Chia et al. (2021) *Nat. Genet.* 53, 294–303. [doi:10.1038/s41588-021-00785-3](https://doi.org/10.1038/s41588-021-00785-3) |
+| Overall dementia | [`F5_DEMENTIA`](https://r12.risteys.finngen.fi/endpoints/F5_DEMENTIA) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+| Vascular dementia | [`F5_VASCDEM`](https://r12.risteys.finngen.fi/endpoints/F5_VASCDEM) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+| Undefined dementia | [`F5_DEMNAS`](https://r12.risteys.finngen.fi/endpoints/F5_DEMNAS) (FinnGen R12) | GRCh38 | Kurki et al. (2023) *Nature* 613, 508–518. [doi:10.1038/s41586-022-05473-8](https://doi.org/10.1038/s41586-022-05473-8) |
+
+### Depression-spectrum traits (3)
+
+| Trait | Accession | Build | Study |
+| ----- | --------- | ----- | ----- |
+| Depressive disorders | [`GCST90476922`](https://www.ebi.ac.uk/gwas/studies/GCST90476922) | GRCh38 | Verma et al. (2024) *Science* 385, eadj1182. [doi:10.1126/science.adj1182](https://doi.org/10.1126/science.adj1182) |
+| Major depressive disorder | [`GCST90468123`](https://www.ebi.ac.uk/gwas/studies/GCST90468123) | GRCh37 | Loya et al. (2025) *Nat. Genet.* 57, 461–468. [doi:10.1038/s41588-024-02044-7](https://doi.org/10.1038/s41588-024-02044-7) |
+| Mixed anxiety and depressive disorder | [`GCST90225526`](https://www.ebi.ac.uk/gwas/studies/GCST90225526) | GRCh37 | Brasher et al. (2023) *Genes Brain Behav.* 22, e12851. [doi:10.1111/gbb.12851](https://doi.org/10.1111/gbb.12851) |
+
+### Reference resources
+
+| Resource | Used for | Notes |
+| -------- | -------- | ----- |
+| dbSNP 144 (GRCh37 and GRCh38) | rsID and allele harmonisation | `SNPlocs.Hsapiens.dbSNP144.*` |
+| 1000 Genomes hs37d5 | reference alleles | `BSgenome.Hsapiens.1000genomes.hs37d5` |
+| UCSC liftover chains | build conversion | for example `hg38ToHg19.over.chain` |
+| GTEx v7 brain eQTL | GWAS–eQTL colocalisation | Step 6 |
+| MetaBrain brain eQTL | GWAS–eQTL colocalisation | Step 6 |
+| 1000 Genomes EUR (PLINK) | LD reference for downstream tools | FUMA, SMR |
+
+---
+
+## 🧫 Single-cell data sources
+
+Step 7 uses publicly available human-brain single-nucleus RNA-seq.
+
+| Dataset | Phenotype | Groups | Role |
+| ------- | --------- | ------ | ---- |
+| [GSE303823](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE303823) | Dementia | Control, ADD, DLB, PDD | annotated reference object, dementia versus control contrasts |
+| [GSE213982](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE213982) | Major depressive disorder | case, control | count matrix with per-barcode cell-type labels |
+| [GSE144136](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE144136) | Major depressive disorder | case, control | sample-level metadata via GEOquery |
 
 ---
 
@@ -141,416 +229,297 @@ The pipeline supports both **GRCh37** and **GRCh38** with automatic liftover cap
 ### Prerequisites
 
 - **R** ≥ 4.2
-- **Python** ≥ 3.8
-- **Conda** (recommended for environment management)
-- **Linux** environment (required for MTAG execution)
+- **Python** ≥ 3.8 for FUMA and novel-locus scripts
+- **Python 2.7** for MTAG only, isolated in its own Conda environment
+- **Linux** for MTAG. The remaining stages run on Linux or Windows
+- **Conda** recommended for environment management
 
-### Step 1: Clone Repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/Hexiao-DING/Dementia_Depression_Multi-traits-analysis.git
 cd Dementia_Depression_Multi-traits-analysis
 ```
 
-### Step 2: Create Conda Environments
+### 2. R dependencies
 
-```bash
-# Create R environment
-conda create -n gwas_r r-base=4.2 -y
-
-# Create Python environment
-conda create -n gwas_py python=3.10 -y
-```
-
-### Step 3: Install R Dependencies
-
-```bash
-conda activate gwas_r
-```
+<details>
+<summary><b>GWAS QC and colocalisation packages</b></summary>
 
 ```r
-# Install CRAN packages
+# CRAN
 install.packages(c(
-  "data.table", "dplyr", "tidyr", "stringr",
-  "duckdb", "DBI", "httr"
+  "data.table", "dplyr", "tidyr", "stringr", "readr",
+  "httr", "devtools", "RcppEigen", "DBI", "duckdb",
+  "openxlsx", "writexl"
 ))
 
-# Install Bioconductor packages
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
+# Bioconductor
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(c(
-  "MungeSumstats",
-  "rtracklayer",
+  "MungeSumstats", "rtracklayer", "biomaRt",
   "SNPlocs.Hsapiens.dbSNP144.GRCh37",
-  "AnnotationHub"
+  "SNPlocs.Hsapiens.dbSNP144.GRCh38",
+  "BSgenome.Hsapiens.1000genomes.hs37d5"
 ))
 
-# Install HyPrColoc
+# Colocalisation
 install.packages("hyprcoloc", repos = "https://cloud.r-project.org")
 ```
+</details>
 
-### Step 4: Install Python Dependencies
-
-```bash
-conda activate gwas_py
-pip install pandas numpy pyarrow
-```
-
-### Step 5: External Tools
-
-- **MTAG**: Follow instructions in `docs/Step2-MTAG_linux.txt` for Linux setup
-- **FUMA**: Web-based tool ([fuma.ctglab.nl](https://fuma.ctglab.nl/))
-- **SMR**: Optional replication tool (see `docs/Step4-NovelLoci_2_replication_SMR.txt`)
-- **PLINK**: Reference data (1000 Genomes EUR) for LD-based tools
-- **eQTL Panels**: MetaBrain and GTEx brain eQTL data
-
----
-
-## 🚀 Quick Start
-
-### Minimal Example
-
-```bash
-# 1. Activate R environment
-conda activate gwas_r
-
-# 2. Run QC for a single trait
-Rscript R/Step1-QC_GWAS_dementia.R
-
-# 3. Activate Python environment
-conda activate gwas_py
-
-# 4. Process FUMA results
-python python/Step3-FUMA_1_Table_creating.py \
-  --in Files/FUMA_results/Raw_FUMA_results \
-  --out Files/FUMA_results/tables
-```
-
-### Full Pipeline
-
-See [Workflow Steps](#-workflow-steps) for detailed instructions on running the complete analysis pipeline.
-
----
-
-## 📁 Data Preparation
-
-### Directory Structure
-
-Scripts reference paths under `D:/Projects_data&code/Stage1_bioinformatics_ADandDepression`. You can either:
-
-1. **Mirror the hierarchy locally**, or
-2. **Edit path constants** in scripts to match your local directories
-
-### Required Data Directories
-
-```
-Data/
-├── GWAS/
-│   ├── Downloaded_original_data/      # Raw GWAS summary statistics
-│   ├── Format_sumstats_data/           # Intermediate harmonised data
-│   ├── Final_processed_data/           # Final QC'd GWAS
-│   ├── MTAG_input_data/                # MTAG-formatted inputs
-│   └── LDSC_input_data/                # LDSC-formatted inputs
-├── eQTL/                               # Brain eQTL panels (MetaBrain, GTEx)
-└── Files/
-    ├── MTAG_results/                   # MTAG outputs
-    ├── FUMA_results/
-    │   ├── Raw_FUMA_results/           # Downloaded FUMA outputs
-    │   ├── tables/                     # Extracted tables
-    │   ├── robust/                     # Robust filtered results
-    │   └── novel/                      # Novel loci
-    └── Coloc_results/                  # Colocalisation results
-```
-
-### Project Structure
-
-```
-.
-├── R/                                  # R scripts
-│   ├── Step1-QC_GWAS_*.R              # GWAS QC and harmonisation
-│   ├── Step5-Hyprcoloc_Trait-Trait.R  # Trait-trait colocalisation
-│   ├── Step7-Hyprcoloc_GWAS-eQTL.R    # GWAS-eQTL colocalisation
-│   └── Step9-Hyprcoloc_3_GWAS-eQTLBrain.R
-├── python/                             # Python scripts
-│   ├── Step3-FUMA_*.py                 # FUMA post-processing
-│   ├── Step4-NovelLoci_*.py           # Novel locus identification
-│   └── Step6_Merging_*.py             # Result integration
-├── docs/                               # Documentation
-│   ├── Step2-MTAG_linux.txt           # MTAG setup guide
-│   └── Step4-NovelLoci_2_replication_SMR.txt
-└── figs/                               # Figures and plots
-```
-
-> **Note**: Ensure parent folders exist before running scripts; most scripts do not create directories automatically.
-
-### Dataset Readiness Checklist
-
-Before starting the pipeline, verify:
-
-- [ ] All raw GWAS archives present under `Data/GWAS/Downloaded_original_data/`
-- [ ] Reference build known (GRCh37/GRCh38) for each study
-- [ ] Chain files available for liftover (if needed)
-- [ ] eQTL panels downloaded and documented (MetaBrain/GTEx)
-- [ ] PLINK reference specified (1000 Genomes EUR) for LD-based tools
-- [ ] Disk space verified for intermediate outputs (recommend ≥100 GB free)
-
----
-
-## 🔬 Workflow Steps
-
-### Step 1: GWAS QC and Harmonisation
-
-**Scripts**: `R/Step1-QC_GWAS_*.R`
-
-**Purpose**: Standardises public GWAS to a uniform schema for MTAG/LDSC.
-
-**Key Actions**:
-- ✅ Allele checks and orientation
-- ✅ Compute β/SE from OR when needed
-- ✅ MAF imputation
-- ✅ Missingness filters
-- ✅ GRCh38↔GRCh37 liftover
-
-**Example**:
+<details>
+<summary><b>Single-cell packages (Step 7)</b></summary>
 
 ```r
-source("R/Step1-QC_GWAS_dementia.R")
-# Configure input/output paths at top of the script
-run_qc_for_trait("dementia")
+# CRAN and core single-cell
+install.packages(c(
+  "Seurat", "tidyverse", "Matrix", "qs", "igraph", "ggrepel",
+  "patchwork", "cowplot", "plyr", "purrr", "viridis", "randomcoloR",
+  "clustree", "UpSetR", "WGCNA"
+))
+
+# Bioconductor
+BiocManager::install(c(
+  "SingleCellExperiment", "scater", "MAST", "muscat", "limma",
+  "GEOquery", "SingleR", "GSVA", "GSEABase", "BiocParallel", "NMF"
+))
+
+# GitHub-hosted tools
+devtools::install_github(c(
+  "smorabit/hdWGCNA",
+  "sqjin/CellChat",
+  "cailab-tamu/scTenifoldKnk",
+  "immunogenomics/harmony"
+))
+# Additional helpers used in the scripts: scCustomize, SCpubr, UCell, irGSEA, monocle, CCA
 ```
+</details>
 
----
-
-### Step 2: MTAG Execution
-
-**Documentation**: `docs/Step2-MTAG_linux.txt`
-
-**Purpose**: Multi-trait meta-analysis to identify shared genetic signals.
-
-**Requirements**: 
-- Linux environment
-- Python 2.7-compatible MTAG installation
-
-**Example**:
+### 3. Python dependencies
 
 ```bash
-# After preparing harmonised inputs in MTAG format
-python mtag.py \
-  --sumstats trait1.sumstats.gz,trait2.sumstats.gz,... \
-  --out Files/MTAG_results/mtag_joint \
-  --n_min 50000 \
-  --force
+# FUMA and novel-locus scripts (Python 3)
+conda create -n gwas_py python=3.10 -y
+conda activate gwas_py
+pip install pandas numpy
 ```
+
+### 4. MTAG (Linux, Python 2.7)
+
+Follow `Step 2. MTAG_Linux command/Step2-MTAG_linux.txt`. In summary:
+
+```bash
+conda create -n py27 python=2.7 -y
+conda activate py27
+conda install -y numpy scipy pandas argparse bitarray joblib
+conda install -y libgfortran==1
+
+wget https://github.com/JonJala/mtag/archive/refs/heads/master.zip
+unzip master.zip && cd mtag-master
+```
+
+### 5. External tools
+
+| Tool | Type | Reference |
+| ---- | ---- | --------- |
+| MTAG | command line | [JonJala/mtag](https://github.com/JonJala/mtag) |
+| FUMA | web service | [fuma.ctglab.nl](https://fuma.ctglab.nl/) |
+| SMR | command line, optional (v1.3.1) | [yanglab SMR](https://yanglab.westlake.edu.cn/software/smr/) |
+| PLINK | command line | 1000 Genomes EUR reference |
 
 ---
 
-### Step 3: FUMA Post-Processing
+## ▶️ Running the pipeline
 
-**Scripts**: `python/Step3-FUMA_*.py`
+> **Important.** Scripts use absolute paths from the original project layout, rooted at `D:/Projects_data&code/Stage1_bioinformatics_ADandDepression`. Python scripts set their paths inside a `__main__` block or a function call at the bottom of the file rather than reading command-line flags. Before running any stage, open the script and edit the input and output paths to match your machine. Create parent directories first, since most scripts do not create them automatically.
 
-**Purpose**: Extract, merge, and filter FUMA annotation results.
+### Step 1 · QC and harmonisation
 
-**Script Overview**:
+```r
+# In R, edit setwd() and the Downloaded_original_data paths, then run the trait group you need
+source("Step 1. Quality control_GWAS/Step1-QC_GWAS_DEMtraits.R")   # Alzheimer's, cognition, FTD, LBD
+source("Step 1. Quality control_GWAS/Step1-QC_GWAS_DDtraits.R")    # depressive disorders, MADD, MDD
+source("Step 1. Quality control_GWAS/Step1-QC_GWAS_Finngen.R")     # FinnGen R12 dementia endpoints
+```
+
+Each script standardises column names, derives beta and standard error from odds ratios where only an OR and confidence interval are reported, computes minor allele frequency and Z, harmonises alleles, and lifts GRCh38 studies down to GRCh37 (hg19). Outputs land in `Format_sumstats_data/` and `Final_processed_data/`.
+
+### Step 2 · MTAG
+
+```bash
+conda activate py27
+cd mtag-master
+python mtag.py \
+  --sumstats "MTAGMDDsummary.txt,MTAGADsummary.txt" \
+  --out "/path/to/MTAG_results/MDD_AD" \
+  --n_min 0.0 \
+  --force \
+  --stream_stdout
+```
+
+Run one invocation per trait pair. `--n_min 0.0` disables the minimum sample-size-ratio filter. Joint summary statistics from this stage feed every later stage.
+
+### Step 3 · FUMA post-processing
+
+Upload harmonised or MTAG statistics to FUMA, download the result archives, then process them in order. Edit the directory constants near the top or bottom of each script before running.
+
+```bash
+conda activate gwas_py
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_1_Table_creating.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_2_Merging_by_trait.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_3_Robust_filter.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_4_Delete_failed.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_5_Unique_IndSNPs.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_6.1_ExamSNPs_dementia.py"
+python "Step 3. Functional mapping and annotation (FUMA)/Step3-FUMA_6.2_ExamSNPs_depression.py"
+```
 
 | Script | Purpose |
-|:-------|:--------|
-| `Step3-FUMA_1_Table_creating.py` | Extract per-locus tables from raw FUMA zips to harmonised CSV |
-| `Step3-FUMA_2_Merging_by_trait.py` | Merge locus-level annotations across trait pairs |
-| `Step3-FUMA_3_Robust_filter.py` | Concordance/robustness checks vs. original GWAS |
-| `Step3-FUMA_4_Delete_failed.py` | Drop non-robust entries, preserve high-confidence loci |
-| `Step3-FUMA_5_Unique_IndSNPs.py` | Deduplicate lead SNPs by trait combination |
-| `Step3-FUMA_6.1_ExamSNPs_dementia.py` | Generate dementia-specific inspection tables |
-| `Step3-FUMA_6.2_ExamSNPs_depression.py` | Generate depression-specific inspection tables |
+| ------ | ------- |
+| `1_Table_creating` | parse raw FUMA outputs (`leadSNPs.txt`, `IndSigSNPs.txt`, `snps.txt`, `annov.txt`) into harmonised per-locus tables |
+| `2_Merging_by_trait` | merge locus annotations across trait pairs |
+| `3_Robust_filter` | concordance and robustness checks against the source statistics |
+| `4_Delete_failed` | drop non-robust entries, keep high-confidence loci |
+| `5_Unique_IndSNPs` | deduplicate independent lead SNPs by trait combination |
+| `6.1` / `6.2` | build dementia-specific and depression-specific inspection tables |
 
-**Examples**:
-
-```bash
-conda activate gwas_py
-
-# Extract FUMA tables
-python python/Step3-FUMA_1_Table_creating.py \
-  --in Files/FUMA_results/Raw_FUMA_results \
-  --out Files/FUMA_results/tables
-
-# Robust filtering
-python python/Step3-FUMA_3_Robust_filter.py \
-  --mtag Files/MTAG_results \
-  --gwas Data/GWAS/Final_processed_data \
-  --out Files/FUMA_results/robust
-```
-
----
-
-### Step 4: Novel Locus Definition
-
-**Script**: `python/Step4-NovelLoci_1_definition.py`
-
-**Purpose**: Flags loci absent from major catalogues, annotates gene context, aggregates candidates.
-
-**Example**:
+### Step 4 · Novel-locus definition
 
 ```bash
-python python/Step4-NovelLoci_1_definition.py \
-  --in Files/FUMA_results/robust \
-  --out Files/FUMA_results/novel
+python "Step 4. Novel loci definition and replication/Step4-NovelLoci_1_definition.py"
 ```
 
----
+Cross-references FUMA loci against the GWAS Catalog (`gwascatalog.txt`) to flag loci not previously reported. `Step4-NovelLoci_2_replication_SMR.txt` documents converting eQTL summary data to BESD format and running SMR against the MTAG signals for replication.
 
-### Step 5: Trait–Trait Colocalisation
-
-**Script**: `R/Step5-Hyprcoloc_Trait-Trait.R`
-
-**Purpose**: Constructs effect matrices from MTAG and sentinel SNPs, runs HyPrColoc, saves posterior probabilities and credible sets.
-
-**Example**:
+### Step 5 · Trait–trait colocalisation
 
 ```r
-source("R/Step5-Hyprcoloc_Trait-Trait.R")
-run_hyprcoloc_trait_trait(
-  mtag_dir = "Files/MTAG_results",
-  sentinels = "Files/FUMA_results/novel/sentinels.csv",
-  out_dir = "Files/Coloc_results/trait_trait"
-)
+source("Step 5. Trait-trait colocalisation analysis/Step5-Hyprcoloc_Trait-Trait.R")
 ```
-
----
-
-### Step 6: Coloc Result Integration
-
-**Script**: `python/Step6_Merging_Trait-Trait_coloc.py`
-
-**Purpose**: Merges per-pair HyPrColoc results into consolidated summary tables.
-
-**Example**:
-
 ```bash
-python python/Step6_Merging_Trait-Trait_coloc.py \
-  --in Files/Coloc_results/trait_trait \
-  --out Files/Coloc_results/trait_trait_merged.csv
+python "Step 5. Trait-trait colocalisation analysis/Step5_Merging_Trait-Trait_coloc.py"
 ```
 
----
+Builds effect and standard-error matrices from MTAG results at sentinel SNPs, runs HyPrColoc per trait pair, then consolidates posterior probabilities and credible sets into a single table.
 
-### Step 7: GWAS–eQTL Colocalisation
-
-**Scripts**: `R/Step7-Hyprcoloc_GWAS-eQTL.R`, `R/Step9-Hyprcoloc_3_GWAS-eQTLBrain.R`
-
-**Purpose**: Tests MTAG loci for colocalisation with brain eQTL panels (MetaBrain/GTEx), using harmonised allele windows around targets.
-
-**Example**:
+### Step 6 · GWAS–eQTL colocalisation
 
 ```r
-source("R/Step7-Hyprcoloc_GWAS-eQTL.R")
-run_hyprcoloc_eqtl(
-  mtag_hits = "Files/MTAG_results/mtag_joint.signals.csv",
-  eqtl_root = "Data/eQTL",
-  out_dir = "Files/Coloc_results/gwas_eqtl"
-)
+source("Step 6. trait-eQTL colocalisation analysis/Step6-Hyprcoloc_GWAS-eQTL.R")        # GTEx v7
+source("Step 6. trait-eQTL colocalisation analysis/Step6-Hyprcoloc_3_GWAS-eQTLBrain.R")  # MetaBrain
+source("Step 6. trait-eQTL colocalisation analysis/Step6_Merging_1_gene_symbol.R")       # probe to symbol
+```
+```bash
+python "Step 6. trait-eQTL colocalisation analysis/Step6_Merging_2_GWAS-eQTL_coloc.py"
 ```
 
----
+Tests MTAG loci for colocalisation with brain eQTL panels across harmonised allele windows, maps probes to gene symbols, and consolidates the results.
 
-### Step 8: Optional Replication with SMR
+### Step 7 · Single-cell validation
 
-**Documentation**: `docs/Step4-NovelLoci_2_replication_SMR.txt`
+Load the environment script first, then run the analyses in order. Set `setwd()` and the dataset paths at the top of each file.
 
-**Purpose**: Convert eQTL to BESD format, run SMR against MTAG/GWAS, export for comparison.
+```r
+source("Step 7. Single-cell RNA analysis/Step7-scRNA_analysis_Rset.R")          # libraries
+source("Step 7. Single-cell RNA analysis/Step7-01scRNA_analysis_QC.R")          # QC, diagnosis labels
+source("Step 7. Single-cell RNA analysis/Step7-02scRNA_analysis_MAST&hdWGCNA.R") # DE + co-expression
+source("Step 7. Single-cell RNA analysis/Step7-03scRNA_analysis_muscat.R")       # pseudobulk DS
+source("Step 7. Single-cell RNA analysis/Step7-04scRNA_analysis_CellChat.R")     # cell communication
+source("Step 7. Single-cell RNA analysis/Step7-05scRNA_analysis_scTenifoldKnk.R") # NEGR1 knockout
+```
+
+| Script | Method | Output |
+| ------ | ------ | ------ |
+| `01_QC` | Seurat, scCustomize | quality-controlled objects, harmonised diagnosis labels |
+| `02_MAST&hdWGCNA` | MAST, hdWGCNA | cell-type differential expression, co-expression modules |
+| `03_muscat` | muscat | pseudobulk differential-state genes by cell type |
+| `04_CellChat` | CellChat | cell–cell communication networks, NEGR signalling |
+| `05_scTenifoldKnk` | scTenifoldKnk | virtual NEGR1 knockout, differential gene regulation |
 
 ---
 
 ## 📤 Outputs
 
-The pipeline generates outputs in the following directories:
+| Output | Typical location | Description |
+| ------ | ---------------- | ----------- |
+| Harmonised GWAS | `Final_processed_data/` | QC'd, build-harmonised summary statistics |
+| MTAG results | MTAG output prefix | joint multi-trait statistics per trait pair |
+| FUMA tables | FUMA results directory | per-locus annotation, robust and deduplicated lead SNPs |
+| Novel loci | novel-locus output | candidate loci absent from known catalogues |
+| Colocalisation | colocalisation output | trait–trait and GWAS–eQTL posterior probabilities and credible sets |
+| Single-cell | per-script output | DE tables, co-expression modules, communication networks, knockout results |
 
-| Output Type | Location | Description |
-|:------------|:---------|:------------|
-| **Harmonised GWAS** | `Data/GWAS/Final_processed_data/` | QC'd and harmonised summary statistics |
-| **MTAG Results** | `Files/MTAG_results/` | Multi-trait meta-analysis outputs |
-| **FUMA Loci** | `Files/FUMA_results/` | Functional annotation results |
-| **Colocalisation** | `Files/Coloc_results/` | Trait-trait and GWAS-eQTL colocalisation summaries |
-| **SMR Outputs** | As configured in `docs/` | Optional replication results |
+---
+
+## 🔁 Reproducibility notes
+
+- **Paths.** Every script encodes absolute Windows-style paths from the original analysis. Edit these before running, or mirror the directory layout locally.
+- **Builds.** Inputs arrive in a mix of GRCh37 and GRCh38. Confirm the build of each source, keep liftover chain files available, and verify a consistent build before MTAG and colocalisation.
+- **Allele orientation.** Effect-allele orientation must be consistent across traits before MTAG and across trait and eQTL before HyPrColoc. Misaligned alleles are a common cause of spurious or absent signal.
+- **MTAG environment.** MTAG depends on Python 2.7 and an older Fortran runtime. Keep it isolated from the Python 3 and R environments used elsewhere.
+- **Disk.** Intermediate GWAS and eQTL files are large. Allow ample free space before starting.
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Common Issues and Solutions
-
-| Issue | Solution |
-|:------|:---------|
-| **Missing columns during harmonisation** | Check delimiter, header case, required fields (SNP/CHR/BP/EA/NEA/BETA/SE/OR/P) |
-| **Build mismatch (hg19 vs hg38)** | Confirm chain files and `rtracklayer` liftover paths are correct |
-| **MTAG alignment errors** | Verify allele orientation and sample-size metadata; ensure identical SNP IDs across traits |
-| **FUMA parsing errors** | Ensure raw FUMA directory structure is intact; unzip files before running step 3.1 |
-| **HyPrColoc failures** | Check MAF/effect alignment, region window sizes, and missingness filters |
-
----
-
-## ❓ FAQ
-
-### Do I need Linux for MTAG?
-
-Yes, MTAG requires a Linux environment. Follow `docs/Step2-MTAG_linux.txt` to create a Python 2.7-compatible MTAG environment on Linux.
-
-### Which genome build should I use?
-
-The pipeline supports both GRCh37/GRCh38 with liftover capabilities. Keep a consistent build across steps or perform liftover during the QC step.
-
-### Can I run only FUMA and colocalisation?
-
-Yes. Provide harmonised GWAS/MTAG inputs in the expected formats and start from step 3 (FUMA post-processing) or step 5 (colocalisation).
-
-### Where do I put FUMA downloads?
-
-Place downloaded FUMA outputs under `Files/FUMA_results/Raw_FUMA_results/` before running step 3 scripts. Ensure the directory structure matches FUMA's output format.
-
-### How long does the full pipeline take?
-
-Processing time varies by dataset size and computational resources. Typical runtime:
-- **Step 1 (QC)**: 1-2 hours per trait
-- **Step 2 (MTAG)**: 2-4 hours for all traits
-- **Step 3 (FUMA post-processing)**: 30 minutes - 1 hour
-- **Steps 4-7 (Colocalisation)**: 1-3 hours depending on number of loci
+| Symptom | Likely cause and fix |
+| ------- | -------------------- |
+| Missing columns during harmonisation | check delimiter, header case, and required fields (SNP, CHR, BP, effect and other allele, BETA or OR, SE, P) |
+| Build mismatch between traits | confirm the source build and the liftover chain path used by `rtracklayer` |
+| MTAG alignment errors | verify allele orientation and sample-size metadata, and that SNP identifiers match across traits |
+| FUMA parsing errors | unzip FUMA archives and keep the original directory structure before Step 3 |
+| HyPrColoc returns nothing | check MAF and effect alignment, region window size, and missingness filters |
+| Single-cell object will not load | confirm the GEO files, the matrix and barcode and feature triplet, and the working directory |
 
 ---
 
-## 📚 Citation and References
+## 📚 Citation
 
-### Source Repository
+If this pipeline supports your work, please cite the repository and the methods it builds on.
 
-- **Repository**: [https://github.com/Hexiao-DING/Dementia_Depression_Multi-traits-analysis](https://github.com/Hexiao-DING/Dementia_Depression_Multi-traits-analysis)
+**Repository**
+> Ding H, Li N, Yoo JS. Dementia–Depression Multi-Trait Analysis Pipeline. GitHub repository. https://github.com/Hexiao-DING/Dementia_Depression_Multi-traits-analysis
 
-### Key Methodological References
+<details>
+<summary><b>Methods references</b></summary>
 
-**MTAG**  
-Turley P, Walters RK, Maghzian O, *et al*. Multi-trait analysis of genome-wide association summary statistics using MTAG. *Nat Genet*. 2018;50:229-237.  
-[DOI: 10.1038/s41588-017-0009-4](https://doi.org/10.1038/s41588-017-0009-4)
+- **MTAG.** Turley P, Walters RK, Maghzian O, et al. Multi-trait analysis of genome-wide association summary statistics using MTAG. *Nat Genet*. 2018;50:229–237. [doi:10.1038/s41588-017-0009-4](https://doi.org/10.1038/s41588-017-0009-4)
+- **FUMA.** Watanabe K, Taskesen E, van Bochoven A, et al. Functional mapping and annotation of genetic associations with FUMA. *Nat Commun*. 2017;8:1826. [doi:10.1038/s41467-017-01261-5](https://doi.org/10.1038/s41467-017-01261-5)
+- **HyPrColoc.** Foley CN, Staley JR, Breen PG, et al. A fast and efficient colocalization algorithm for identifying shared genetic risk factors across multiple traits. *Nat Commun*. 2021;12:764. [doi:10.1038/s41467-020-20885-8](https://doi.org/10.1038/s41467-020-20885-8)
+- **SMR.** Zhu Z, Zhang F, Hu H, et al. Integration of summary data from GWAS and eQTL studies predicts complex trait gene targets. *Nat Genet*. 2016;48:481–487. [doi:10.1038/ng.3538](https://doi.org/10.1038/ng.3538)
+- **Seurat.** Hao Y, Hao S, Andersen-Nissen E, et al. Integrated analysis of multimodal single-cell data. *Cell*. 2021;184:3573–3587. [doi:10.1016/j.cell.2021.04.048](https://doi.org/10.1016/j.cell.2021.04.048)
+- **MAST.** Finak G, McDavid A, Yajima M, et al. MAST, a flexible statistical framework for single-cell RNA sequencing data. *Genome Biol*. 2015;16:278. [doi:10.1186/s13059-015-0844-5](https://doi.org/10.1186/s13059-015-0844-5)
+- **hdWGCNA.** Morabito S, Reese F, Rahimzadeh N, et al. hdWGCNA identifies co-expression networks in high-dimensional transcriptomics data. *Cell Rep Methods*. 2023;3:100498. [doi:10.1016/j.crmeth.2023.100498](https://doi.org/10.1016/j.crmeth.2023.100498)
+- **muscat.** Crowell HL, Soneson C, Germain PL, et al. muscat detects subpopulation-specific state transitions from multi-sample multi-condition single-cell transcriptomics data. *Nat Commun*. 2020;11:6077. [doi:10.1038/s41467-020-19894-4](https://doi.org/10.1038/s41467-020-19894-4)
+- **CellChat.** Jin S, Guerrero-Juarez CF, Zhang L, et al. Inference and analysis of cell-cell communication using CellChat. *Nat Commun*. 2021;12:1088. [doi:10.1038/s41467-021-21246-9](https://doi.org/10.1038/s41467-021-21246-9)
+- **scTenifoldKnk.** Osorio D, Zhong Y, Li G, et al. scTenifoldKnk, an efficient virtual knockout tool for gene function predictions via single-cell gene regulatory network perturbation. *Patterns*. 2022;3:100434. [doi:10.1016/j.patter.2022.100434](https://doi.org/10.1016/j.patter.2022.100434)
 
-**FUMA**  
-Watanabe K, Taskesen E, van Bochoven A, *et al*. Functional mapping and annotation of genetic associations with FUMA. *Nat Commun*. 2017;8:1826.  
-[DOI: 10.1038/s41467-017-01261-5](https://doi.org/10.1038/s41467-017-01261-5)
-
-**HyPrColoc**  
-Foley CN, Staley JR, Breen PG, *et al*. A fast and efficient colocalization algorithm for identifying shared genetic risk factors across multiple traits. *PLoS Genet*. 2021;17:e1009440.  
-[DOI: 10.1371/journal.pgen.1009440](https://doi.org/10.1371/journal.pgen.1009440)
+</details>
 
 ---
 
+## 📄 License
 
-## 🙏 Acknowledgements
+Released under the [MIT License](LICENSE). Copyright (c) 2025 Hexiao-DING.
+
+The pipeline depends on third-party tools and public datasets carrying their own licenses and data-use terms. Review and comply with each before use and redistribution.
+
+---
+
+## 🙏 Authors and acknowledgements
 
 | Role | Name | Affiliation |
-|:-----|:-----|:------------|
-| **Contributors** | Hexiao Ding | The Hong Kong Polytechnic University |
-| **Contributors** | Na Li | Sichuan University |
-| **Supervisor** | Dr. Jung Sun Yoo | The Hong Kong Polytechnic University |
+| ---- | ---- | ----------- |
+| Lead, genomics pipeline | Hexiao Ding | The Hong Kong Polytechnic University |
+| Single-cell analysis | Na Li | Sichuan University, State Key Laboratory of Biotherapy |
+| Supervisor | Dr. Jung Sun Yoo | The Hong Kong Polytechnic University |
 
-**Institutions**:
-- The Hong Kong Polytechnic University
-- Sichuan University
+We thank the GWAS Catalog, FinnGen, GTEx, MetaBrain, and the contributing GEO studies for making the underlying data available, and the developers of MTAG, FUMA, HyPrColoc, SMR, and the single-cell tools listed above.
 
-**Version**: 1.2  
-**Last Updated**: 2025-11-23
+<div align="center">
 
+**Questions or issues?** Open an [issue](https://github.com/Hexiao-DING/Dementia_Depression_Multi-traits-analysis/issues) on the repository.
+
+</div>
