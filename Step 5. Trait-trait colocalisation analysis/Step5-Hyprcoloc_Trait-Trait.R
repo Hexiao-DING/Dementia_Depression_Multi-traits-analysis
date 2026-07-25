@@ -92,12 +92,13 @@ run_hyprcoloc_analysis <- function(folder, origin_gwas1, origin_gwas2, target_sn
     colnames(se_matrix) <- traits
     
     # Run hyprcoloc
+    traits_outcomes <- ifelse(traits == "CP", 0, 1)
     hyprcoloc_result <- hyprcoloc(
       beta_matrix,
       se_matrix,
       trait.names = traits,
       snp.id = rownames(beta_matrix),
-      binary.outcomes = c(1,1),
+      binary.outcomes = traits_outcomes,
       prior.1 = 1e-4,
       prior.c = 0.02
     )
