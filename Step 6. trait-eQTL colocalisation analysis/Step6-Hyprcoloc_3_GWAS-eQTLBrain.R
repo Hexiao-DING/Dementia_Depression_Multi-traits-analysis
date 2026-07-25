@@ -214,12 +214,13 @@ run_coloc_analysis <- function(gwas_files, qtl_files, target_snps,
         colnames(se_matrix) <- traits
         
         # Perform colocalization analysis
+        traits_outcomes <- c(ifelse(gwas_name == "CP", 0, 1), 0)
         hyprcoloc_result <- tryCatch({
           hyprcoloc(
             beta_matrix,
             se_matrix,
             trait.names = traits,
-            binary.outcomes = c(1,0),
+            binary.outcomes = traits_outcomes,
             snp.id = rownames(beta_matrix),
             prior.1 = 1e-4,
             prior.c = 0.02
