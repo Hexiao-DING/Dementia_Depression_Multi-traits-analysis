@@ -69,7 +69,7 @@ mm <- model.matrix(~ 0 + ei$group_id)
 dimnames(mm) <- list(ei$sample_id, levels(ei$group_id))  
 contrast <- makeContrasts(paste0(g_n[1],'-',g_n[2]), levels = mm)  
 # run DS analysis  
-res <- pbDS(pb, verbose = FALSE,contrast = contrast,filter = 'none') 
+res <- pbDS(pb, verbose = FALSE, design = mm, contrast = contrast,filter = 'none') 
 group_ALL <- bind_rows(res$table[[1]])  
 write.csv(file = paste0('2.allgene_nofilter.csv'),group_ALL)  
 candidate_file <- "D:/Projects_data&code/Stage1_bioinformatics_ADandDepression/STRING/candidate_genes_TeQ.txt"
